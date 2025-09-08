@@ -1,21 +1,18 @@
 # dependencies
-/node_modules
-/.pnp
+**/node_modules
+**/.pnp
 .pnp.js
 
 # testing
-/coverage
+**/coverage
 
 # production
-/build
-/dist
+**/build
+**/dist
 
 # misc
 .DS_Store
-.env
-.env.local
-.env.development.local
-.env.production.local
+.env*
 .idea/
 .vscode/
 *.log
@@ -28,7 +25,7 @@ npm-debug.log*
 yarn-error.log*
 
 # svelte
-/.svelte-kit
+**/.svelte-kit
 
 # next.js
-/.next
+**/.next
