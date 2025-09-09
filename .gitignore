@@ -29,3 +29,15 @@ yarn-error.log*
 
 # next.js
 **/.next
+
+# Dependencies
+/node_modules
+/client/node_modules
+/server/node_modules
+
+# Environment variables
+/client/.env
+/server/.env
+
+# Production
+/client/dist

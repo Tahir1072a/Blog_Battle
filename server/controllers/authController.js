@@ -14,6 +14,7 @@ export const registerUser = async (req, res) => {
 
     let user = await User.findOne({ email });
     if (user) {
+      console.log("Emial hatası");
       return res
         .status(400)
         .json({ message: "Bu e-posta adresi zaten kullanılıyor." });
