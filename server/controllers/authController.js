@@ -14,7 +14,6 @@ export const registerUser = async (req, res) => {
 
     let user = await User.findOne({ email });
     if (user) {
-      console.log("Emial hatası");
       return res
         .status(400)
         .json({ message: "Bu e-posta adresi zaten kullanılıyor." });
@@ -61,7 +60,14 @@ export const loginUser = async (req, res) => {
       expiresIn: "1d",
     });
 
-    res.status(200).json({ token });
+    const userToSend = {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    };
+
+    res.status(200).json({ token, user: userToSend });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

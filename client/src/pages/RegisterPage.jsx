@@ -15,15 +15,13 @@ function RegisterPage() {
     try {
       await api.post("/auth/register", data);
 
-      setTimeout(() => {
-        navigate("/login", {
-          state: { successMessage: "Hesabınız başarıyla oluşturulmuştur" },
-        });
-      }, 1000);
+      navigate("/login", {
+        state: { successMessage: "Hesabınız başarıyla oluşturulmuştur" },
+      });
     } catch (err) {
       const errorMessage = err.response?.data?.message || "Bir hata oluştu.";
       setError(errorMessage);
-      console.error(err);
+      console.error(error);
     } finally {
       setIsLoading(false);
     }
