@@ -12,7 +12,7 @@ function Navbar() {
   const currentUser = useSelector(selectCurrentUser);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  //   console.log(currentUser);
+
   const handleLogout = () => {
     dispatch(logOut());
     navigate("/login");
