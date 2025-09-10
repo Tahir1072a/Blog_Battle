@@ -36,8 +36,8 @@ yarn-error.log*
 /server/node_modules
 
 # Environment variables
-/client/.env
-/server/.env
+client/.env
+server/.env
 
 # Production
 /client/dist
