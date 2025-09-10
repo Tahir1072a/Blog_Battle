@@ -6,6 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { WinnerBadge } from "./WinnerBadge";
 
 export function BlogCard({ blog }) {
   const truncateContent = (text, length) => {
@@ -18,7 +19,8 @@ export function BlogCard({ blog }) {
       to={`/blog/${blog._id}`}
       className="block hover:shadow-lg transition-shadow duration-300"
     >
-      <Card className="h-full flex flex-col">
+      <Card className="h-full flex flex-col relative">
+        <WinnerBadge level={blog.round} />
         <CardHeader>
           <img
             src={blog.imageUrl}

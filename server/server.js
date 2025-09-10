@@ -9,6 +9,8 @@ import authRoutes from "./routes/authRoutes.js";
 import blogRoutes from "./routes/blogRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import battleRoutes from "./routes/battleRoutes.js";
+import voteRoutes from "./routes/voteRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -33,6 +35,7 @@ app.use("/api/blogs", blogRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/battles", battleRoutes);
 app.use("/api/votes", voteRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 const PORT = process.env.PORT || 5000;
 

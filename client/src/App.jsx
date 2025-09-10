@@ -7,8 +7,7 @@ import CreateBlogPage from "./pages/CreateBlogPage";
 import HomePage from "./pages/HomePage";
 import BlogDetailPage from "./pages/BlogDetailPage";
 import BattlePage from "./pages/BattlePage";
-
-const ProfilePage = () => <div>Profil Sayfası (Korumalı)</div>;
+import ProfilePage from "./pages/ProfilePage";
 
 function App() {
   return (
@@ -25,6 +24,7 @@ function App() {
 
           <Route element={<PrivateRoute />}>
             <Route path="/create-blog" element={<CreateBlogPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
             <Route path="/profile" element={<ProfilePage />} />
             {/* Buraya başka korumalı rotalar da ekleyebilirsiniz */}
           </Route>

@@ -1,5 +1,5 @@
-import Battle from "../models/Battle";
-import Blog from "../models/Blog";
+import Battle from "../models/Battle.js";
+import Blog from "../models/Blog.js";
 
 /**
  * Bir savaşı sonlandırır, kazananı belirler, kazananın seviyesini artırır

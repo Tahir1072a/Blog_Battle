@@ -47,6 +47,18 @@ export const createNewBattle = async () => {
   });
   await newBattle.save();
 
+  await Notification.create({
+    user: blog1.author,
+    message: `"${blog1.title}" başlıklı yazın, ${blog2.title}" başlıklı yazı ile savaşa girdi!`,
+    link: notificationLink,
+  });
+
+  await Notification.create({
+    user: blog2.author,
+    message: `"${blog2.title}" başlıklı yazın, "${blog1.title}" başlıklı yazı ile savaşa girdi!`,
+    link: notificationLink,
+  });
+
   await Blog.findByIdAndUpdate(blog1._id, { status: "in_match" });
   await Blog.findByIdAndUpdate(blog2._id, { status: "in_match" });
 

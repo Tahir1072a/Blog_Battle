@@ -8,7 +8,8 @@ export function VoteCard({ blog, onVote, disabled }) {
       }`}
       onClick={() => !disabled && onVote(blog._id)}
     >
-      <Card className="h-full flex flex-col border-2 hover:border-blue-500">
+      <Card className="h-full flex flex-col border-2 hover:border-blue-500 relative">
+        <WinnerBadge level={blog.round} />
         <CardHeader>
           <img
             src={blog.imageUrl}
