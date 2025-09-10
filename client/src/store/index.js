@@ -1,31 +1,43 @@
+// client/src/store/index.js
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer, { logOut } from "./slices/authSlice.js";
-import api from "../utils/api.js";
+import { api } from "./api/baseApi.js";
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
-    // Diğer slice'lar buraya eklenecek
+    [api.reducerPath]: api.reducer,
   },
-  devTools: true,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: [
+          "api/executeQuery/pending",
+          "api/executeQuery/fulfilled",
+          "api/executeQuery/rejected",
+        ],
+      },
+    }).concat(api.middleware),
+  devTools: process.env.NODE_ENV !== "production",
 });
 
-api.interceptors.request.use((config) => {
-  const token = store.getState().auth.token;
-  if (token) {
-    config.headers["Authorization"] = `Bearer ${token}`;
-  }
-  return config;
-});
+api.middleware.toString = () => "rtkQueryMiddleware";
 
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
+// Custom middleware for handling 401 errors
+const authMiddleware = (store) => (next) => (action) => {
+  if (action.type?.endsWith("/rejected")) {
+    const { payload } = action;
+    if (payload?.status === 401) {
       store.dispatch(logOut());
-      return Promise.reject(error);
+      store.dispatch(api.util.resetApiState());
     }
-
-    return Promise.reject(error);
   }
-);
+  return next(action);
+};
+
+export { useAppDispatch, useAppSelector } from "./hooks";
+
+import { useDispatch, useSelector } from "react-redux";
+
+export const useAppDispatch = () => useDispatch();
+export const useAppSelector = useSelector;

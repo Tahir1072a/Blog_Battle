@@ -11,13 +11,18 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 function BattlePage() {
-  const [battles, setBattles] = useState([]);
+  const {
+    data: battles = [],
+    isLoading,
+    error,
+    refetch,
+  } = useGetActiveBattlesQuery();
+
+  const [castVote, { isLoading: isVoting }] = useCastVoteMutation();
+
   const [votedBattleIds, setVotedBattleIds] = useState(new Set());
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [resultAfterVote, setResultAfterVote] = useState(null);
-  const [isVoting, setIsVoting] = useState(false);
 
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const navigate = useNavigate();
@@ -56,33 +61,11 @@ function BattlePage() {
     fetchInitialData();
   }, [fetchInitialData]);
 
-  // *** DÜZELTME: EKSİK OLAN handleVote FONKSİYONU EKLENDİ ***
-  const handleVote = async (votedForBlogId) => {
-    if (isVoting) return;
-
-    if (!isAuthenticated) {
-      navigate("/login", { state: { from: { pathname: "/battle" } } });
-      return;
-    }
-
-    setIsVoting(true);
-    setError(null);
-
-    const battleId = battles[currentIndex]._id;
-
+  const handleVote = async (battleId, blogId) => {
     try {
-      const response = await api.post(`/votes`, {
-        battleId: battleId,
-        blogId: votedForBlogId,
-      });
-      setResultAfterVote(response.data); // Oylama sonucunu göstermek için state'i güncelle
-      setVotedBattleIds((prev) => new Set(prev).add(battleId)); // Bu savaşı oylanmış olarak işaretle
+      await castVote({ battleId, blogId }).unwrap();
     } catch (err) {
-      setError(
-        err.response?.data?.message || "Oylama sırasında bir hata oluştu."
-      );
-    } finally {
-      setIsVoting(false);
+      console.error("Oylama hatası:", err);
     }
   };
 

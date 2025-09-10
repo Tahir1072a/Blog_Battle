@@ -4,11 +4,12 @@ import { BlogForm } from "@/components/blog/BlogForm";
 import api from "@/utils/api";
 
 function CreateBlogPage() {
-  const [isLoading, setIsLoading] = useState(false);
+  const [createBlog, { isLoading }] = useCreateBlogMutation();
+  const [uploadImage, { isLoading: isUploading }] = useUploadImageMutation();
+
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const [isUploading, setIsUploading] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
 
   const handleImageDrop = useCallback(async (acceptedFiles, form) => {
@@ -44,17 +45,23 @@ function CreateBlogPage() {
   }, []);
 
   const handleCreateBlog = async (data) => {
-    setIsLoading(true);
-    setError(null);
     try {
-      await api.post("/blogs", data);
-
+      await createBlog(data).unwrap();
       navigate("/");
     } catch (err) {
-      const errorMessage = err.response?.data?.message || "Bir hata oluştu.";
-      setError(errorMessage);
-    } finally {
-      setIsLoading(false);
+      setError(err.data?.message || "Bir hata oluştu.");
+    }
+  };
+
+  const handleImageUpload = async (files) => {
+    const formData = new FormData();
+    formData.append("image", files[0]);
+
+    try {
+      const result = await uploadImage(formData).unwrap();
+      return result.imageUrl;
+    } catch (err) {
+      throw new Error("Görsel yüklenemedi");
     }
   };
 

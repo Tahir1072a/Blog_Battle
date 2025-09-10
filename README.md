@@ -130,7 +130,3 @@ Sistemde örnek veriler mevcuttur:
 ✅ Bildirim sistemi
 ✅ Animasyonlu geçişler
 ✅ Dosya yükleme sistemi
-
----
-
-**Not**: Bu proje Tarvina Yazılım mülakat görevi olarak geliştirilmiştir.
