@@ -3,8 +3,8 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import Navbar from "./components/common/Navbar";
 import PrivateRoute from "./components/common/PrivateRoute";
+import CreateBlogPage from "./pages/CreateBlogPage";
 
-const CreateBlogPage = () => <div>Yazı Oluşturma Sayfası (Korumalı)</div>;
 const ProfilePage = () => <div>Profil Sayfası (Korumalı)</div>;
 
 function App() {
