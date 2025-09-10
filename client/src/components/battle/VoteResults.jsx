@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-export function VoteResults({ battleResult, onNextBattle, hasMoreBattles }) {
+export function VoteResults({ battleResult, onNextBattle }) {
   const { blog1, blog2, blog1Votes, blog2Votes } = battleResult;
   const totalVotes = blog1Votes + blog2Votes;
   const blog1Percentage =
@@ -63,11 +63,13 @@ export function VoteResults({ battleResult, onNextBattle, hasMoreBattles }) {
         />
       </div>
 
-      <div className="text-center mt-12">
-        <Button size="lg" onClick={handleNextClick} disabled={!hasMoreBattles}>
-          {hasMoreBattles ? "Yeni Savaşa Geç" : "Tüm Savaşları Oyladınız"}
-        </Button>
-      </div>
+      {onNextBattle && (
+        <div className="text-center mt-12">
+          <Button size="lg" onClick={onNextBattle}>
+            Kalan Savaşları Gör
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

@@ -17,22 +17,22 @@ const createNotification = async (userId, message) => {
 export const sendBattleStartNotification = async (blog1, blog2) => {
   await createNotification(
     blog1.author,
-    `"${blog1.title}" başlıklı yazın, "${blog2.title}" başlıklı yazı ile savaşa girdi!`
+    `"**${blog1.title}**" başlıklı yazın, "**${blog2.title}**" başlıklı yazı ile savaşa girdi!`
   );
   await createNotification(
     blog2.author,
-    `"${blog2.title}" başlıklı yazın, "${blog1.title}" başlıklı yazı ile savaşa girdi!`
+    `"**${blog2.title}**" başlıklı yazın, "**${blog1.title}**" başlıklı yazı ile savaşa girdi!`
   );
 };
 
 export const sendBattleResultNotifications = async (winnerBlog, loserBlog) => {
   await createNotification(
     winnerBlog.author,
-    `🎉 Tebrikler! "${winnerBlog.title}" başlıklı yazınız savaşı kazandı ve ${winnerBlog.round}. seviyeye yükseldi!`
+    `🎉 Tebrikler! "**${winnerBlog.title}**" başlıklı yazınız savaşı kazandı ve ${winnerBlog.round}. seviyeye yükseldi!`
   );
   await createNotification(
     loserBlog.author,
-    `"${loserBlog.title}" başlıklı yazınız savaşı kaybetti, ancak havuzda yeni fırsatlar sizi bekliyor!`
+    `"**${loserBlog.title}**" başlıklı yazınız savaşı kaybetti, ancak havuzda yeni fırsatlar sizi bekliyor!`
   );
 };
 
@@ -49,10 +49,10 @@ export const sendDrawNotifications = async (battle) => {
 
   await createNotification(
     blog1.author._id,
-    `"${blog1.title}" başlıklı yazınızın savaşı berabere bitti. Yeni bir şans için havuzda bekliyor!`
+    `"**${blog1.title}**" başlıklı yazınızın savaşı berabere bitti. Yeni bir şans için havuzda bekliyor!`
   );
   await createNotification(
     blog2.author._id,
-    `"${blog2.title}" başlıklı yazınızın savaşı berabere bitti. Yeni bir şans için havuzda bekliyor!`
+    `"**${blog2.title}**" başlıklı yazınızın savaşı berabere bitti. Yeni bir şans için havuzda bekliyor!`
   );
 };

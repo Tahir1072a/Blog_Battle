@@ -8,6 +8,11 @@ import {
   globalErrorHandler,
   notFoundHandler,
 } from "./middleware/errorMiddleware.js";
+import cron from "node-cron";
+import {
+  resolveExpiredBattles,
+  checkAndCreateNewBattles,
+} from "./services/bracketService.js";
 
 import authRoutes from "./routes/authRoutes.js";
 import blogRoutes from "./routes/blogRoutes.js";
@@ -51,3 +56,26 @@ app.use(globalErrorHandler);
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => console.log(`Sunucu ${PORT} portunda çalışıyor.`));
+
+cron.schedule("*/5 * * * *", async () => {
+  console.log(
+    "⏰ Zamanlanmış görev çalışıyor: Süresi dolan savaşlar kontrol ediliyor..."
+  );
+  try {
+    const resolvedCount = await resolveExpiredBattles();
+    if (resolvedCount > 0) {
+      console.log(
+        `✅ ${resolvedCount} adet süresi dolan savaş sonlandırıldı ve yenileri tetiklendi.`
+      );
+    } else {
+      console.log("💨 Süresi dolan savaş bulunamadı.");
+    }
+
+    console.log(
+      "💨 Aktif savaş sayısı kontrol ediliyor ve gerekirse yenileri oluşturuluyor..."
+    );
+    await checkAndCreateNewBattles();
+  } catch (error) {
+    console.error("❌ Zamanlanmış görev sırasında bir hata oluştu:", error);
+  }
+});

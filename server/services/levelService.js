@@ -36,10 +36,32 @@ export const calculateUserLevel = async (userId) => {
     }
   }
 
+  const totalBattles = await Battle.countDocuments({
+    $or: [
+      {
+        blog1: {
+          $in: (
+            await Blog.find({ author: userId }).select("_id")
+          ).map((b) => b._id),
+        },
+      },
+      {
+        blog2: {
+          $in: (
+            await Blog.find({ author: userId }).select("_id")
+          ).map((b) => b._id),
+        },
+      },
+    ],
+  });
+  stats.winRate =
+    totalBattles > 0 ? ((stats.totalWins / totalBattles) * 100).toFixed(0) : 0;
+
   return {
     level: currentLevel,
     ...USER_LEVELS[currentLevel],
     nextLevel: USER_LEVELS[currentLevel + 1] || null,
+    stats: stats,
   };
 };
 

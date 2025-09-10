@@ -6,6 +6,17 @@ import { Bell } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNotification } from "@/hooks/useNotification";
 
+const FormatNotificationMessage = ({ message }) => {
+  const parts = message.split("**");
+  return (
+    <span>
+      {parts.map((part, index) =>
+        index % 2 === 1 ? <strong key={index}>{part}</strong> : part
+      )}
+    </span>
+  );
+};
+
 function Navbar() {
   const { isAuthenticated, currentUser, logout } = useAuth();
   const { notifications, showNotifications, toggleNotifications, unreadCount } =
@@ -55,7 +66,9 @@ function Navbar() {
                             key={notif._id}
                             className="p-4 border-b hover:bg-gray-50 text-sm"
                           >
-                            {notif.message}
+                            <FormatNotificationMessage
+                              message={notif.message}
+                            />
                           </li>
                         ))
                       ) : (

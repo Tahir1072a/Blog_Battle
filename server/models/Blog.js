@@ -30,7 +30,7 @@ const BlogSchema = new mongoose.Schema(
     },
 
     round: {
-      type: String,
+      type: Number,
       default: 1,
     },
   },

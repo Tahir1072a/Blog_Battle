@@ -6,7 +6,7 @@ export const getMyNotifications = async (req, res) => {
   try {
     const notifications = await Notification.find({ user: req.user._id })
       .sort({ createdAt: -1 })
-      .limit(10); // Son 10 bildirimi getir
+      .limit(6);
     res.status(200).json(notifications);
   } catch (error) {
     res.status(500).json({ message: "Bildirimler alınamadı." });

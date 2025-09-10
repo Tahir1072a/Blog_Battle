@@ -7,28 +7,29 @@ import { SwipeableCard } from "@/components/battle/SwipeableCard";
 import { VoteResults } from "@/components/battle/VoteResults";
 import { PageLoader } from "@/components/common/LoadingSpinner";
 import { ErrorMessage } from "@/components/common/ErrorMessage";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 function BattlePage() {
   const [battles, setBattles] = useState([]);
+  const [votedBattleIds, setVotedBattleIds] = useState(new Set());
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [result, setResult] = useState(null);
+  const [resultAfterVote, setResultAfterVote] = useState(null);
   const [isVoting, setIsVoting] = useState(false);
 
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const navigate = useNavigate();
 
-  const fetchBattles = useCallback(async () => {
+  const fetchInitialData = useCallback(async () => {
     setLoading(true);
     setError(null);
+    setResultAfterVote(null);
+    setCurrentIndex(0);
     try {
-      const { data } = await api.get("/battles");
-
-      // HATA DÜZELTME: API'den gelen savaşları, her iki blogu da
-      // geçerli olanlarla filtreleyelim. Bu, silinmiş bloglara
-      // referans veren bozuk savaş verilerini ayıklar.
-      const validBattles = data.filter(
+      const battlesRes = await api.get("/battles");
+      const validBattles = battlesRes.data.filter(
         (battle) => battle.blog1 && battle.blog2
       );
 
@@ -38,17 +39,24 @@ function BattlePage() {
       } else {
         setBattles(validBattles);
       }
+
+      if (isAuthenticated) {
+        const votesRes = await api.get("/votes/my-votes");
+        const votedIds = new Set(votesRes.data.map((vote) => vote.battle._id));
+        setVotedBattleIds(votedIds);
+      }
     } catch (err) {
       setError("Savaş verileri yüklenirken bir hata oluştu.");
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [isAuthenticated]);
 
   useEffect(() => {
-    fetchBattles();
-  }, [fetchBattles]);
+    fetchInitialData();
+  }, [fetchInitialData]);
 
+  // *** DÜZELTME: EKSİK OLAN handleVote FONKSİYONU EKLENDİ ***
   const handleVote = async (votedForBlogId) => {
     if (isVoting) return;
 
@@ -60,12 +68,15 @@ function BattlePage() {
     setIsVoting(true);
     setError(null);
 
+    const battleId = battles[currentIndex]._id;
+
     try {
       const response = await api.post(`/votes`, {
-        battleId: battles[currentIndex]._id,
+        battleId: battleId,
         blogId: votedForBlogId,
       });
-      setResult(response.data);
+      setResultAfterVote(response.data); // Oylama sonucunu göstermek için state'i güncelle
+      setVotedBattleIds((prev) => new Set(prev).add(battleId)); // Bu savaşı oylanmış olarak işaretle
     } catch (err) {
       setError(
         err.response?.data?.message || "Oylama sırasında bir hata oluştu."
@@ -75,57 +86,80 @@ function BattlePage() {
     }
   };
 
-  const handleNextBattle = () => {
-    setResult(null);
-    if (currentIndex < battles.length - 1) {
-      setCurrentIndex((prev) => prev + 1);
-    } else {
-      setError("Tebrikler! Tüm aktif savaşları oyladınız.");
-      setBattles([]);
-    }
+  const handleNext = () => {
+    if (currentIndex < battles.length - 1) setCurrentIndex((p) => p + 1);
   };
 
-  if (loading) {
-    return <PageLoader text="Savaşlar Yükleniyor..." />;
-  }
+  const handlePrevious = () => {
+    if (currentIndex > 0) setCurrentIndex((p) => p - 1);
+  };
 
-  if (error) {
-    return <ErrorMessage message={error} onRetry={fetchBattles} fullPage />;
-  }
+  if (loading) return <PageLoader text="Savaşlar Yükleniyor..." />;
+  if (error)
+    return <ErrorMessage message={error} onRetry={fetchInitialData} fullPage />;
 
-  if (result) {
+  if (resultAfterVote) {
     return (
       <VoteResults
-        battleResult={result}
-        onNextBattle={handleNextBattle}
-        hasMoreBattles={currentIndex < battles.length - 1}
+        battleResult={resultAfterVote}
+        onNextBattle={fetchInitialData}
+        hasMoreBattles={true}
       />
     );
   }
 
-  if (battles.length === 0 || !battles[currentIndex]) {
+  if (battles.length === 0) {
     return (
       <ErrorMessage
         message="Gösterilecek aktif savaş bulunamadı."
-        onRetry={fetchBattles}
+        onRetry={fetchInitialData}
         fullPage
       />
     );
   }
 
+  const currentBattle = battles[currentIndex];
+  const hasVoted = votedBattleIds.has(currentBattle._id);
+
   return (
     <div className="container mx-auto py-8 flex flex-col items-center">
       <h1 className="text-3xl font-bold text-center mb-2">Blog Savaşları</h1>
       <p className="text-center text-gray-500 mb-8 max-w-md">
-        Hangi yazıyı daha çok beğendin? Beğendiğini sağa, diğerini sola
-        kaydırarak oy ver!
+        {hasVoted
+          ? "Bu savaşa daha önce oy verdiniz. İşte sonuçlar:"
+          : "Savaşlar arasında gezin, beğendiğin ikiliyi oyla!"}
       </p>
-      <SwipeableCard
-        key={battles[currentIndex]._id}
-        battle={battles[currentIndex]}
-        onVote={handleVote}
-        disabled={isVoting}
-      />
+
+      <div className="w-full max-w-5xl flex justify-between items-center mb-4 px-4">
+        <Button
+          onClick={handlePrevious}
+          disabled={currentIndex === 0 || isVoting}
+          variant="outline"
+        >
+          <ChevronLeft className="h-4 w-4 mr-2" /> Önceki
+        </Button>
+        <span className="text-sm font-semibold text-gray-600 px-4 py-2 bg-gray-100 rounded-md">
+          Savaş {currentIndex + 1} / {battles.length}
+        </span>
+        <Button
+          onClick={handleNext}
+          disabled={currentIndex >= battles.length - 1 || isVoting}
+          variant="outline"
+        >
+          Sonraki <ChevronRight className="h-4 w-4 ml-2" />
+        </Button>
+      </div>
+
+      {hasVoted ? (
+        <VoteResults battleResult={currentBattle} onNextBattle={null} />
+      ) : (
+        <SwipeableCard
+          key={currentBattle._id}
+          battle={currentBattle}
+          onVote={handleVote}
+          disabled={isVoting}
+        />
+      )}
     </div>
   );
 }

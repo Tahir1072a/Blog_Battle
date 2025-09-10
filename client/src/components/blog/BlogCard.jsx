@@ -31,7 +31,7 @@ export function BlogCard({ blog }) {
         </CardHeader>
         <CardContent className="flex-grow">
           <p className="text-sm text-gray-600">
-            {truncateContent(blog.content, 62)}
+            {truncateContent(blog.content, 60)}
           </p>
         </CardContent>
         <CardFooter className="flex justify-between items-center text-xs text-gray-500">

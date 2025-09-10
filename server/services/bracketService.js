@@ -120,7 +120,7 @@ export const resolveExpiredBattles = async () => {
 /**
  * Aktif savaş sayısını kontrol eder ve gerekirse yenilerini oluşturur
  */
-const checkAndCreateNewBattles = async () => {
+export const checkAndCreateNewBattles = async () => {
   try {
     const activeBattleCount = await Battle.countDocuments({ status: "active" });
     const MIN_ACTIVE_BATTLES = 2;
