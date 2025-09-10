@@ -24,7 +24,9 @@ function Navbar() {
         <Link to="/" className="text-xl font-bold text-gray-800">
           Blog Battle
         </Link>
-
+        <Link to="/battle">
+          <Button variant="ghost">Savaş Alanı</Button>
+        </Link>
         <div>
           {isAuthenticated ? (
             <div className="flex items-center space-x-4">

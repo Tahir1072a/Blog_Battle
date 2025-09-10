@@ -8,6 +8,7 @@ import { fileURLToPath } from "url";
 import authRoutes from "./routes/authRoutes.js";
 import blogRoutes from "./routes/blogRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
+import battleRoutes from "./routes/battleRoutes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,6 +31,7 @@ app.use("/api/uploads", express.static(path.join(__dirname, "public/uploads")));
 app.use("/api/auth", authRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/api/battles", battleRoutes);
 
 const PORT = process.env.PORT || 5000;
 

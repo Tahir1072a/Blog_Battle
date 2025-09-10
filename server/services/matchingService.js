@@ -1,9 +1,9 @@
-import Blog from "..models/Blog.js";
-import Battle from "../models/Battle";
+import Blog from "../models/Blog.js";
+import Battle from "../models/Battle.js";
 
 // Pooldan rastgele 2 tane blog yazısı seçer ve onları matchler...
 export const createNewBattle = async () => {
-  const availableBlogs = new Blog.find({ status: "in_pool" });
+  const availableBlogs = await Blog.find({ status: "in_pool" });
 
   if (availableBlogs.length < 2) {
     throw new Error("Eşleşme için yeterli blog yazısı bulunmuyor.");

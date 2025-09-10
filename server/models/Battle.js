@@ -12,7 +12,7 @@ const battleSchema = new mongoose.Schema(
       ref: "Blog",
       required: true,
     },
-    blogVotes: {
+    blog1Votes: {
       type: Number,
       default: 0,
     },

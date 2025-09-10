@@ -6,6 +6,7 @@ import PrivateRoute from "./components/common/PrivateRoute";
 import CreateBlogPage from "./pages/CreateBlogPage";
 import HomePage from "./pages/HomePage";
 import BlogDetailPage from "./pages/BlogDetailPage";
+import BattlePage from "./pages/BattlePage";
 
 const ProfilePage = () => <div>Profil Sayfası (Korumalı)</div>;
 
@@ -20,6 +21,7 @@ function App() {
           <Route path="/register" element={<RegisterPage />} />
 
           <Route path="/blog/:id" element={<BlogDetailPage />} />
+          <Route path="/battle" element={<BattlePage />} />
 
           <Route element={<PrivateRoute />}>
             <Route path="/create-blog" element={<CreateBlogPage />} />
