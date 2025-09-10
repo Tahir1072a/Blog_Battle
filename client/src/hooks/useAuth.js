@@ -1,3 +1,5 @@
+// client/src/hooks/useAuth.js
+
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
@@ -5,6 +7,7 @@ import {
   selectIsAuthenticated,
   selectCurrentUser,
 } from "@/store/slices/authSlice";
+import { api } from "@/store/api/baseApi";
 
 export const useAuth = () => {
   const dispatch = useDispatch();
@@ -15,6 +18,7 @@ export const useAuth = () => {
 
   const logout = () => {
     dispatch(logOut());
+    dispatch(api.util.resetApiState());
     navigate("/login");
   };
 

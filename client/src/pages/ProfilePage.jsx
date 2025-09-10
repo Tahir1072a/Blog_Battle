@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-import api from "@/utils/api";
+import { useGetProfileQuery } from "@/store/api/authApi";
 import { BlogList } from "@/components/blog/BlogList";
 import { VotedBattleCard } from "@/components/battle/VotedBattleCard";
 import { PageLoader } from "@/components/common/LoadingSpinner";
@@ -8,27 +7,28 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trophy, FileText, BarChart2 } from "lucide-react";
 
 function ProfilePage() {
-  const [profileData, setProfileData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const {
+    data: profileData,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useGetProfileQuery();
 
-  useEffect(() => {
-    const fetchProfileData = async () => {
-      try {
-        setLoading(true);
-        const { data } = await api.get("/users/profile");
-        setProfileData(data);
-      } catch (err) {
-        setError("Profil verileriniz yüklenirken bir hata oluştu.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProfileData();
-  }, []);
+  if (isLoading) return <PageLoader text="Profiliniz Yükleniyor..." />;
 
-  if (loading) return <PageLoader text="Profiliniz Yükleniyor..." />;
-  if (error) return <ErrorMessage message={error} fullPage />;
+  if (isError)
+    return (
+      <ErrorMessage
+        message={
+          error.data?.message ||
+          "Profil verileriniz yüklenirken bir hata oluştu."
+        }
+        onRetry={refetch}
+        fullPage
+      />
+    );
+
   if (!profileData) return null;
 
   const { user, myBlogs, votedBattles } = profileData;

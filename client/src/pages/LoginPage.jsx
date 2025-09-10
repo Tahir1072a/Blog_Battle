@@ -1,13 +1,12 @@
-import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "@/store/slices/authSlice";
 import { LoginForm } from "@/components/auth/LoginForm";
-import api from "@/utils/api";
+import { useLoginMutation } from "@/store/api/authApi";
+import { ErrorMessage } from "@/components/common/ErrorMessage";
 
 function LoginPage() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const [login, { isLoading, error }] = useLoginMutation();
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -17,24 +16,16 @@ function LoginPage() {
   const from = location.state?.from?.pathname || "/";
 
   const handleLogin = async (data) => {
-    setIsLoading(true);
-    setError(null);
-
     try {
-      const response = await api.post("/auth/login", data);
+      const response = await login(data).unwrap();
 
-      dispatch(setCredentials(response.data));
-
+      dispatch(setCredentials(response));
       navigate(from, { replace: true });
     } catch (err) {
-      const errorMessage =
-        err.response?.data?.message ||
-        "Giriş yapılamadı. Lütfen bilgilerinizi kontrol edin.";
-      setError(errorMessage);
-    } finally {
-      setIsLoading(false);
+      console.error("Giriş başarısız:", err);
     }
   };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="flex flex-col items-center">
@@ -45,9 +36,13 @@ function LoginPage() {
         )}
         <LoginForm onFormSubmit={handleLogin} isLoading={isLoading} />
         {error && (
-          <p className="mt-4 p-3 bg-red-100 text-red-700 rounded-md w-[400px] text-center">
-            {error}
-          </p>
+          <ErrorMessage
+            message={
+              error.data?.message ||
+              "Giriş yapılamadı. Lütfen bilgilerinizi kontrol edin."
+            }
+            className="mt-4 w-[400px]"
+          />
         )}
       </div>
     </div>

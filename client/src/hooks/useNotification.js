@@ -1,42 +1,35 @@
-import { useState, useEffect } from "react";
-import api from "@/utils/api";
+import { useState, useMemo } from "react";
 import { useAuth } from "./useAuth";
+import {
+  useGetNotificationsQuery,
+  useMarkNotificationsAsReadMutation,
+} from "@/store/api/notificationApi";
 
 export const useNotification = () => {
   const { isAuthenticated } = useAuth();
-  const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      const fetchNotifications = async () => {
-        try {
-          const { data } = await api.get("/notifications");
-          setNotifications(data);
-        } catch (error) {
-          console.error("Bildirimler alınamadı:", error);
-        }
-      };
-      fetchNotifications();
-    } else {
-      setNotifications([]);
-    }
-  }, [isAuthenticated]);
+  const { data: notifications = [] } = useGetNotificationsQuery(undefined, {
+    skip: !isAuthenticated,
+    pollingInterval: 60000,
+  });
 
-  const toggleNotifications = async () => {
-    if (!showNotifications) {
-      try {
-        await api.post("/notifications/read");
+  const [markNotificationsAsRead] = useMarkNotificationsAsReadMutation();
 
-        setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
-      } catch (error) {
-        console.error("Bildirimler okundu olarak işaretlenemedi.");
-      }
+  const toggleNotifications = () => {
+    if (!showNotifications && unreadCount > 0) {
+      markNotificationsAsRead()
+        .unwrap()
+        .catch((err) => {
+          console.error("Bildirimler okundu olarak işaretlenemedi:", err);
+        });
     }
     setShowNotifications((prev) => !prev);
   };
 
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
+  const unreadCount = useMemo(() => {
+    return notifications.filter((n) => !n.isRead).length;
+  }, [notifications]);
 
   return { notifications, showNotifications, toggleNotifications, unreadCount };
 };

@@ -1,5 +1,5 @@
 import { BlogList } from "@/components/blog/BlogList";
-import { useGetBlogsQuery } from "@/store/api/blogApiSlice";
+import { useGetBlogsQuery } from "@/store/api/blogApi";
 import { PageLoader } from "@/components/common/LoadingSpinner";
 import { ErrorMessage } from "@/components/common/ErrorMessage";
 

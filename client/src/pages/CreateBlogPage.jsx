@@ -1,10 +1,16 @@
+// client/src/pages/CreateBlogPage.jsx
+
 import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { BlogForm } from "@/components/blog/BlogForm";
-import api from "@/utils/api";
+import {
+  useCreateBlogMutation,
+  useUploadImageMutation,
+} from "@/store/api/blogApi";
+import { ErrorMessage } from "@/components/common/ErrorMessage";
 
 function CreateBlogPage() {
-  const [createBlog, { isLoading }] = useCreateBlogMutation();
+  const [createBlog, { isLoading: isCreating }] = useCreateBlogMutation();
   const [uploadImage, { isLoading: isUploading }] = useUploadImageMutation();
 
   const [error, setError] = useState(null);
@@ -12,56 +18,45 @@ function CreateBlogPage() {
 
   const [imagePreview, setImagePreview] = useState(null);
 
-  const handleImageDrop = useCallback(async (acceptedFiles, form) => {
-    const file = acceptedFiles[0];
-    if (!file) return;
+  const handleImageDrop = useCallback(
+    async (acceptedFiles, form) => {
+      const file = acceptedFiles[0];
+      if (!file) return;
 
-    setIsUploading(true);
-    setError(null);
+      setError(null);
 
-    const formData = new FormData();
-    formData.append("image", file);
+      const formData = new FormData();
+      formData.append("image", file);
 
-    try {
-      const res = await api.post("/upload", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      try {
+        const result = await uploadImage(formData).unwrap();
 
-      const fullImageUrl = `${import.meta.env.VITE_API_BASE_URL}${
-        res.data.imageUrl
-      }`;
+        const fullImageUrl = `${
+          import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api"
+        }${result.imageUrl}`;
 
-      setImagePreview(fullImageUrl);
-      form.setValue("imageUrl", fullImageUrl, { shouldValidate: true });
-    } catch (err) {
-      const errorMessage =
-        err.response?.data?.message || "Görsel yüklenirken bir hata oluştu.";
-      setError(errorMessage);
-    } finally {
-      setIsUploading(false);
-    }
-  }, []);
+        setImagePreview(fullImageUrl);
+        form.setValue("imageUrl", fullImageUrl, { shouldValidate: true });
+      } catch (err) {
+        const errorMessage =
+          err.data?.message || "Görsel yüklenirken bir hata oluştu.";
+        setError(errorMessage);
+      }
+    },
+    [uploadImage]
+  );
 
   const handleCreateBlog = async (data) => {
+    if (!data.imageUrl) {
+      setError("Lütfen bir görsel yükleyin.");
+      return;
+    }
+
     try {
       await createBlog(data).unwrap();
-      navigate("/");
+      navigate("/profile");
     } catch (err) {
-      setError(err.data?.message || "Bir hata oluştu.");
-    }
-  };
-
-  const handleImageUpload = async (files) => {
-    const formData = new FormData();
-    formData.append("image", files[0]);
-
-    try {
-      const result = await uploadImage(formData).unwrap();
-      return result.imageUrl;
-    } catch (err) {
-      throw new Error("Görsel yüklenemedi");
+      setError(err.data?.message || "Blog oluşturulurken bir hata oluştu.");
     }
   };
 
@@ -70,17 +65,16 @@ function CreateBlogPage() {
       <div className="w-full px-4">
         <BlogForm
           onFormSubmit={handleCreateBlog}
-          isLoading={isLoading || isUploading} // Hem form hem görsel yükleme durumunu kontrol et
+          isLoading={isCreating || isUploading}
           submitButtonText="Yazıyı Oluştur"
-          // Form'a gerekli state ve fonksiyonları props olarak geçiyoruz
           onImageDrop={handleImageDrop}
           isUploadingImage={isUploading}
           imagePreviewUrl={imagePreview}
         />
         {error && (
-          <p className="mt-4 p-3 bg-red-100 text-red-700 rounded-md w-full max-w-2xl mx-auto text-center">
-            {error}
-          </p>
+          <div className="w-full max-w-2xl mx-auto mt-4">
+            <ErrorMessage message={error} onDismiss={() => setError(null)} />
+          </div>
         )}
       </div>
     </div>

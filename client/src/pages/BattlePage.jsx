@@ -1,7 +1,13 @@
-import { useState, useEffect, useCallback } from "react";
+// client/src/pages/BattlePage.jsx
+
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import api from "@/utils/api";
+import {
+  useGetActiveBattlesQuery,
+  useCastVoteMutation,
+  useGetMyVotesQuery,
+} from "@/store/api/battleApi";
 import { selectIsAuthenticated } from "@/store/slices/authSlice";
 import { SwipeableCard } from "@/components/battle/SwipeableCard";
 import { VoteResults } from "@/components/battle/VoteResults";
@@ -14,102 +20,105 @@ function BattlePage() {
   const {
     data: battles = [],
     isLoading,
+    isError,
     error,
     refetch,
   } = useGetActiveBattlesQuery();
 
   const [castVote, { isLoading: isVoting }] = useCastVoteMutation();
 
-  const [votedBattleIds, setVotedBattleIds] = useState(new Set());
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [resultAfterVote, setResultAfterVote] = useState(null);
-
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const navigate = useNavigate();
 
-  const fetchInitialData = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    setResultAfterVote(null);
-    setCurrentIndex(0);
-    try {
-      const battlesRes = await api.get("/battles");
-      const validBattles = battlesRes.data.filter(
-        (battle) => battle.blog1 && battle.blog2
-      );
+  const { data: myVotes } = useGetMyVotesQuery(undefined, {
+    skip: !isAuthenticated,
+  });
 
-      if (validBattles.length === 0) {
-        setError("Şu anda oylama için geçerli bir savaş bulunmuyor.");
-        setBattles([]);
-      } else {
-        setBattles(validBattles);
-      }
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [resultAfterVote, setResultAfterVote] = useState(null);
 
-      if (isAuthenticated) {
-        const votesRes = await api.get("/votes/my-votes");
-        const votedIds = new Set(votesRes.data.map((vote) => vote.battle._id));
-        setVotedBattleIds(votedIds);
-      }
-    } catch (err) {
-      setError("Savaş verileri yüklenirken bir hata oluştu.");
-    } finally {
-      setLoading(false);
-    }
-  }, [isAuthenticated]);
+  const votedBattleIds = new Set(myVotes?.map((vote) => vote.battle._id));
 
-  useEffect(() => {
-    fetchInitialData();
-  }, [fetchInitialData]);
-
+  // Bu fonksiyonun imzası doğru: (battleId, blogId)
   const handleVote = async (battleId, blogId) => {
+    if (!isAuthenticated) {
+      navigate("/login", { state: { from: { pathname: "/battle" } } });
+      return;
+    }
+
     try {
-      await castVote({ battleId, blogId }).unwrap();
+      const result = await castVote({ battleId, blogId }).unwrap();
+      setResultAfterVote(result);
     } catch (err) {
       console.error("Oylama hatası:", err);
     }
   };
 
   const handleNext = () => {
-    if (currentIndex < battles.length - 1) setCurrentIndex((p) => p + 1);
+    if (currentIndex < battles.length - 1) {
+      setCurrentIndex((p) => p + 1);
+      setResultAfterVote(null);
+    }
   };
 
   const handlePrevious = () => {
-    if (currentIndex > 0) setCurrentIndex((p) => p - 1);
+    if (currentIndex > 0) {
+      setCurrentIndex((p) => p - 1);
+      setResultAfterVote(null);
+    }
   };
 
-  if (loading) return <PageLoader text="Savaşlar Yükleniyor..." />;
-  if (error)
-    return <ErrorMessage message={error} onRetry={fetchInitialData} fullPage />;
+  const goToNextUnvotedBattle = () => {
+    setResultAfterVote(null);
+    if (currentIndex < battles.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+    } else {
+      alert("Tebrikler! Tüm aktif savaşları oyladınız.");
+    }
+  };
 
-  if (resultAfterVote) {
+  if (isLoading) return <PageLoader text="Savaşlar Yükleniyor..." />;
+
+  if (isError)
     return (
-      <VoteResults
-        battleResult={resultAfterVote}
-        onNextBattle={fetchInitialData}
-        hasMoreBattles={true}
+      <ErrorMessage
+        message={
+          error.data?.message || "Savaş verileri yüklenirken bir hata oluştu."
+        }
+        onRetry={refetch}
+        fullPage
       />
     );
-  }
 
   if (battles.length === 0) {
     return (
       <ErrorMessage
         message="Gösterilecek aktif savaş bulunamadı."
-        onRetry={fetchInitialData}
+        onRetry={refetch}
         fullPage
       />
     );
   }
 
   const currentBattle = battles[currentIndex];
-  const hasVoted = votedBattleIds.has(currentBattle._id);
+  if (!currentBattle) {
+    return (
+      <ErrorMessage
+        message="Savaş verisi bulunamadı. Lütfen sayfayı yenileyin."
+        onRetry={refetch}
+        fullPage
+      />
+    );
+  }
+  const hasVotedOrResultShown =
+    votedBattleIds.has(currentBattle._id) || resultAfterVote;
 
   return (
     <div className="container mx-auto py-8 flex flex-col items-center">
       <h1 className="text-3xl font-bold text-center mb-2">Blog Savaşları</h1>
       <p className="text-center text-gray-500 mb-8 max-w-md">
-        {hasVoted
-          ? "Bu savaşa daha önce oy verdiniz. İşte sonuçlar:"
+        {hasVotedOrResultShown
+          ? "İşte sonuçlar! Sonraki savaşa geçmek için butonu kullanın."
           : "Savaşlar arasında gezin, beğendiğin ikiliyi oyla!"}
       </p>
 
@@ -133,13 +142,17 @@ function BattlePage() {
         </Button>
       </div>
 
-      {hasVoted ? (
-        <VoteResults battleResult={currentBattle} onNextBattle={null} />
+      {hasVotedOrResultShown ? (
+        <VoteResults
+          battleResult={resultAfterVote || currentBattle}
+          onNextBattle={goToNextUnvotedBattle}
+          hasMoreBattles={currentIndex < battles.length - 1}
+        />
       ) : (
         <SwipeableCard
           key={currentBattle._id}
           battle={currentBattle}
-          onVote={handleVote}
+          onVote={(blogId) => handleVote(currentBattle._id, blogId)}
           disabled={isVoting}
         />
       )}
