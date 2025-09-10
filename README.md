@@ -148,7 +148,7 @@ blog-battle/
 
 ## 🔧 Geliştirme Notları
 
-- **MongoDB**: Yerel MongoDB kurulumu gerekli
+- **MongoDB**: Yerel MongoDB kurulumu gerekli değildir. Proje kurulduğunda atlasa bağlanacağız.
 - **Node.js**: v18 veya üzeri önerilen
 - **Environment**: `.env` dosyalarını oluşturmayı unutmayın
 - **Seed Data**: İlk çalıştırmada mutlaka seed komutunu çalıştırın
