@@ -16,6 +16,7 @@ import battleRoutes from "./routes/battleRoutes.js";
 import voteRoutes from "./routes/voteRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -42,6 +43,7 @@ app.use("/api/battles", battleRoutes);
 app.use("/api/votes", voteRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/users", userRoutes);
 
 app.use(notFoundHandler);
 app.use(globalErrorHandler);

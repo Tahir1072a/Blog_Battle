@@ -2,8 +2,9 @@ import React from "react";
 import { motion, useMotionValue, useTransform } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { X, Heart } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-export function SwipeableBattleCard({ battle, onVote, disabled }) {
+export function SwipeableCard({ battle, onVote, disabled }) {
   const { blog1, blog2 } = battle;
 
   const x = useMotionValue(0);

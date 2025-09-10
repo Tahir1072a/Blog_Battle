@@ -23,6 +23,12 @@ function Navbar() {
             <Button variant="ghost">Savaş Alanı</Button>
           </Link>
 
+          {currentUser?.role === "admin" && (
+            <Link to="/admin">
+              <Button variant="destructive">Admin Paneli</Button>
+            </Link>
+          )}
+
           {isAuthenticated ? (
             <>
               <Link to="/create-blog">

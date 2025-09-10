@@ -8,6 +8,8 @@ import HomePage from "./pages/HomePage";
 import BlogDetailPage from "./pages/BlogDetailPage";
 import BattlePage from "./pages/BattlePage";
 import ProfilePage from "./pages/ProfilePage";
+import AdminRoute from "./components/common/AdminRoute";
+import AdminPage from "./pages/AdminPage";
 
 function App() {
   return (
@@ -25,7 +27,10 @@ function App() {
           <Route element={<PrivateRoute />}>
             <Route path="/create-blog" element={<CreateBlogPage />} />
             <Route path="/profile" element={<ProfilePage />} />
-            {/* Buraya başka korumalı rotalar da ekleyebilirsiniz */}
+          </Route>
+
+          <Route element={<AdminRoute />}>
+            <Route path="/admin" element={<AdminPage />} />
           </Route>
         </Routes>
       </main>

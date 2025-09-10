@@ -38,6 +38,12 @@ const seedDatabase = async () => {
         email: "mehmet@example.com",
         password: hashedPassword,
       },
+      {
+        name: "Admin",
+        email: "admin@example.com",
+        password: hashedPassword,
+        role: "admin", // Rolü admin olarak ayarlandı
+      },
     ]);
     console.log(`${users.length} kullanıcı oluşturuldu.`);
 
