@@ -1,6 +1,7 @@
 import React from "react";
 import { motion, useMotionValue, useTransform } from "framer-motion";
 import { X, Heart } from "lucide-react";
+import { WinnerBadge } from "../blog/WinnerBadge";
 
 export function SwipeableCard({ battle, onVote, disabled }) {
   const { blog1, blog2 } = battle;
@@ -43,7 +44,9 @@ export function SwipeableCard({ battle, onVote, disabled }) {
           className="absolute left-0 w-[45%] h-full cursor-pointer"
           onClick={() => !disabled && onVote(blog1._id)}
         >
-          <div className="w-full h-full rounded-2xl shadow-lg bg-white border flex flex-col overflow-hidden hover:shadow-xl transition-shadow duration-300">
+          {/* Sol Kart */}
+          <div className="relative w-full h-full rounded-2xl shadow-lg bg-white border flex flex-col overflow-hidden hover:shadow-xl transition-shadow duration-300">
+            <WinnerBadge level={blog1.round} />
             <div className="w-full h-1/2 flex-shrink-0">
               <img
                 src={blog1.imageUrl}
@@ -51,7 +54,6 @@ export function SwipeableCard({ battle, onVote, disabled }) {
                 className="w-full h-full object-cover"
               />
             </div>
-
             <div className="p-4 flex flex-col flex-grow">
               <h3 className="font-bold text-lg mb-2 line-clamp-2">
                 {blog1.title}
@@ -71,7 +73,9 @@ export function SwipeableCard({ battle, onVote, disabled }) {
           className="absolute right-0 w-[45%] h-full cursor-pointer"
           onClick={() => !disabled && onVote(blog2._id)}
         >
-          <div className="w-full h-full rounded-2xl shadow-lg bg-white border flex flex-col overflow-hidden hover:shadow-xl transition-shadow duration-300">
+          {/* Sağ Kart */}
+          <div className="relative w-full h-full rounded-2xl shadow-lg bg-white border flex flex-col overflow-hidden hover:shadow-xl transition-shadow duration-300">
+            <WinnerBadge level={blog2.round} />
             <div className="w-full h-1/2 flex-shrink-0">
               <img
                 src={blog2.imageUrl}
@@ -79,7 +83,6 @@ export function SwipeableCard({ battle, onVote, disabled }) {
                 className="w-full h-full object-cover"
               />
             </div>
-
             <div className="p-4 flex flex-col flex-grow">
               <h3 className="font-bold text-lg mb-2 line-clamp-2">
                 {blog2.title}
