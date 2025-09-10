@@ -4,6 +4,10 @@ import cors from "cors";
 import connectDB from "./config/database.js";
 import path from "path";
 import { fileURLToPath } from "url";
+import {
+  globalErrorHandler,
+  notFoundHandler,
+} from "./middleware/errorMiddleware.js";
 
 import authRoutes from "./routes/authRoutes.js";
 import blogRoutes from "./routes/blogRoutes.js";
@@ -38,6 +42,9 @@ app.use("/api/battles", battleRoutes);
 app.use("/api/votes", voteRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/admin", adminRoutes);
+
+app.use(notFoundHandler);
+app.use(globalErrorHandler);
 
 const PORT = process.env.PORT || 5000;
 

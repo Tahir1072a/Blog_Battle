@@ -1,6 +1,11 @@
 import Battle from "../models/Battle.js";
 import Blog from "../models/Blog.js";
-import Notification from "../models/Notification.js";
+import { checkAndHandleLevelUp } from "./levelService.js";
+import {
+  sendBattleResultNotifications,
+  sendDrawNotifications,
+} from "./notificationService.js";
+import { createNewBattle } from "./matchingService.js";
 
 /**
  * Bir savaşı sonlandırır, kazananı belirler, kazananın seviyesini artırır
@@ -43,7 +48,7 @@ export const resolveBattle = async (battleId) => {
       battle.status = "finished";
       await battle.save();
 
-      await createDrawNotifications(battle);
+      await sendDrawNotifications(battle);
 
       console.log(`Battle ${battleId} ended in a draw.`);
       return battle;
@@ -66,7 +71,11 @@ export const resolveBattle = async (battleId) => {
     battle.winner = winnerId;
     await battle.save();
 
-    await createBattleResultNotifications(
+    if (winnerBlog && winnerBlog.author) {
+      await checkAndHandleLevelUp(winnerBlog.author);
+    }
+
+    await sendBattleResultNotifications(
       winnerBlog,
       loserBlog,
       updatedWinner.round
@@ -133,63 +142,6 @@ const checkAndCreateNewBattles = async () => {
     }
   } catch (error) {
     console.error("Error checking and creating new battles:", error);
-  }
-};
-
-/**
- * Savaş sonucu bildirimlerini oluşturur
- */
-const createBattleResultNotifications = async (
-  winnerBlog,
-  loserBlog,
-  newRound
-) => {
-  try {
-    await Notification.create({
-      user: winnerBlog.author,
-      message: `🎉 Tebrikler! "${winnerBlog.title}" başlıklı yazınız savaşı kazandı ve ${newRound}. seviyeye yükseldi!`,
-    });
-
-    await Notification.create({
-      user: loserBlog.author,
-      message: `"${loserBlog.title}" başlıklı yazınız savaşı kaybetti, ancak havuzda yeni fırsatlar sizi bekliyor!`,
-    });
-
-    if (newRound === 5) {
-      await Notification.create({
-        user: winnerBlog.author,
-        message: `🏆 Harika! Yazınız "Usta Yazar" seviyesine ulaştı! (5. seviye)`,
-      });
-    } else if (newRound === 10) {
-      await Notification.create({
-        user: winnerBlog.author,
-        message: `👑 Efsane! Yazınız "Efsane Kalem" seviyesine ulaştı! (10. seviye)`,
-      });
-    }
-  } catch (error) {
-    console.error("Error creating battle result notifications:", error);
-  }
-};
-
-/**
- * Beraberlik durumunda bildirim oluşturur
- */
-const createDrawNotifications = async (battle) => {
-  try {
-    const blog1 = await Blog.findById(battle.blog1).populate("author");
-    const blog2 = await Blog.findById(battle.blog2).populate("author");
-
-    await Notification.create({
-      user: blog1.author._id,
-      message: `"${blog1.title}" başlıklı yazınızın savaşı berabere bitti. Yeni bir şans için havuzda bekliyor!`,
-    });
-
-    await Notification.create({
-      user: blog2.author._id,
-      message: `"${blog2.title}" başlıklı yazınızın savaşı berabere bitti. Yeni bir şans için havuzda bekliyor!`,
-    });
-  } catch (error) {
-    console.error("Error creating draw notifications:", error);
   }
 };
 
