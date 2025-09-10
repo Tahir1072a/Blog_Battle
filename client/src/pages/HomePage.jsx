@@ -1,18 +1,27 @@
-import { useState, useEffect } from "react";
 import { BlogList } from "@/components/blog/BlogList";
-import api from "@/utils/api";
+import { useGetBlogsQuery } from "@/store/api/blogApiSlice";
+import { PageLoader } from "@/components/common/LoadingSpinner";
+import { ErrorMessage } from "@/components/common/ErrorMessage";
 
 function HomePage() {
-  const { data: blogs = [], isLoading, error, refetch } = useGetBlogsQuery();
+  const {
+    data: blogs,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useGetBlogsQuery();
 
   if (isLoading) {
-    return <LoadingSpinner fullScreen text="Bloglar yükleniyor..." />;
+    return <PageLoader text="Yazılar yükleniyor..." />;
   }
 
-  if (error) {
+  if (isError) {
     return (
       <ErrorMessage
-        message="Blog yazıları yüklenirken bir hata oluştu."
+        message={
+          error.data?.message || "Blog yazıları yüklenirken bir hata oluştu."
+        }
         onRetry={refetch}
         fullPage
       />
