@@ -32,6 +32,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/battles", battleRoutes);
+app.use("/api/votes", voteRoutes);
 
 const PORT = process.env.PORT || 5000;
 

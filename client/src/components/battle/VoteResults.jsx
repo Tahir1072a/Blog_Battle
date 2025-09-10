@@ -53,6 +53,12 @@ export function VoteResults({ battleResult }) {
           votes={blog2Votes}
         />
       </div>
+
+      <div className="text-center mt-12">
+        <Button size="lg" onClick={onNextBattle}>
+          Yeni Savaşa Geç
+        </Button>
+      </div>
     </div>
   );
 }

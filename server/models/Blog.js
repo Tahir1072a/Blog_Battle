@@ -25,14 +25,13 @@ const BlogSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["in_pool", "in_match", "archived"],
+      enum: ["in_pool", "in_match"],
       default: "in_pool",
     },
 
-    badges: {
-      type: [String],
-      enum: ["Weekly Champion", "Top Voted", "Finalist"],
-      default: [],
+    round: {
+      type: String,
+      default: 1,
     },
   },
   { timestamps: true }

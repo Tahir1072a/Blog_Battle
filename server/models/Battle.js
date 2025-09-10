@@ -30,9 +30,12 @@ const battleSchema = new mongoose.Schema(
       ref: "Blog",
       default: null,
     },
-    round: {
+    endsAt: {
+      type: Date,
+    },
+    voteLimit: {
       type: Number,
-      default: 1,
+      default: 10,
     },
   },
   { timestamps: true }

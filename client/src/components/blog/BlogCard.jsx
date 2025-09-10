@@ -32,8 +32,11 @@ export function BlogCard({ blog }) {
             {truncateContent(blog.content, 62)}
           </p>
         </CardContent>
-        <CardFooter className="flex justify-between text-xs text-gray-500">
-          <span>Yazar: {blog.author?.name || "Bilinmiyor"}</span>
+        <CardFooter className="flex justify-between items-center text-xs text-gray-500">
+          <div>
+            <p>Yazar: {blog.author?.name || "Bilinmiyor"}</p>
+            <p className="font-bold text-blue-600">Seviye: {blog.round}</p>
+          </div>
           <span className="font-semibold bg-gray-100 px-2 py-1 rounded">
             {blog.category}
           </span>

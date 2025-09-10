@@ -24,7 +24,8 @@ export function BattleArena({ initialBattle }) {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await api.post(`/battles/${battle._id}/vote`, {
+      const response = await api.post(`/votes`, {
+        battleId: battle._id,
         blogId: votedForBlogId,
       });
       setResult(response.data);
@@ -38,7 +39,7 @@ export function BattleArena({ initialBattle }) {
   };
 
   if (result) {
-    return <VoteResults battleResult={result} />;
+    return <VoteResults battleResult={result} onNextBattle={onNextBattle} />;
   }
 
   return (

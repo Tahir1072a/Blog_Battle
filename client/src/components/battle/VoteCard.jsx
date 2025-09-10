@@ -16,6 +16,9 @@ export function VoteCard({ blog, onVote, disabled }) {
             className="w-full h-56 object-cover rounded-t-lg"
           />
           <CardTitle className="mt-4">{blog.title}</CardTitle>
+          <p className="text-sm font-semibold text-blue-700 pt-2">
+            Seviye: {blog.round}
+          </p>
         </CardHeader>
         <CardContent className="flex-grow">
           <p className="prose lg:prose-xl break-words whitespace-pre-wrap">
