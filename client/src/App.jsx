@@ -25,7 +25,6 @@ function App() {
           <Route element={<PrivateRoute />}>
             <Route path="/create-blog" element={<CreateBlogPage />} />
             <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/profile" element={<ProfilePage />} />
             {/* Buraya başka korumalı rotalar da ekleyebilirsiniz */}
           </Route>
         </Routes>

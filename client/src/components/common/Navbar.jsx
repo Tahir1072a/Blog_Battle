@@ -25,6 +25,9 @@ function Navbar() {
 
           {isAuthenticated ? (
             <>
+              <Link to="/create-blog">
+                <Button>Yazı Oluştur</Button>
+              </Link>
               <div className="relative">
                 <Button
                   variant="ghost"

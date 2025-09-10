@@ -5,13 +5,7 @@ dotenv.config();
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI, {
-      maxPoolSize: 10,
-      serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 45000,
-      bufferCommands: false,
-      bufferMaxEntries: 0,
-    });
+    const conn = await mongoose.connect(process.env.MONGODB_URI, {});
     console.log(`MongoDB Bağlantısı Başarılı: ${conn.connection.host}`);
 
     process.on("SIGINT", async () => {

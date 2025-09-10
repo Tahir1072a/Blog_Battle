@@ -11,6 +11,7 @@ import uploadRoutes from "./routes/uploadRoutes.js";
 import battleRoutes from "./routes/battleRoutes.js";
 import voteRoutes from "./routes/voteRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -36,6 +37,7 @@ app.use("/api/upload", uploadRoutes);
 app.use("/api/battles", battleRoutes);
 app.use("/api/votes", voteRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/admin", adminRoutes);
 
 const PORT = process.env.PORT || 5000;
 
