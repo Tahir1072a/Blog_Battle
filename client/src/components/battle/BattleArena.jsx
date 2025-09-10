@@ -7,7 +7,7 @@ import { VoteCard } from "./VoteCard";
 import { VoteResults } from "./VoteResults";
 import { VoteAnimation } from "./VoteAnimation";
 
-export function BattleArena({ initialBattle, onNextBattle }) {
+export function BattleArena({ initialBattle, onNextBattle, hasMoreBattles }) {
   const [battle, setBattle] = useState(initialBattle);
   const [result, setResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -58,7 +58,11 @@ export function BattleArena({ initialBattle, onNextBattle }) {
   if (result) {
     return (
       <VoteAnimation>
-        <VoteResults battleResult={result} onNextBattle={onNextBattle} />
+        <VoteResults
+          battleResult={result}
+          onNextBattle={onNextBattle}
+          hasMoreBattles={hasMoreBattles}
+        />
       </VoteAnimation>
     );
   }

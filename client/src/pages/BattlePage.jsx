@@ -54,6 +54,7 @@ function BattlePage() {
         key={currentBattle._id}
         initialBattle={currentBattle}
         onNextBattle={goToNextBattle}
+        hasMoreBattles={battles.length > 1}
       />
       {battles.length > 1 && (
         <>

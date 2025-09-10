@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-export function VoteResults({ battleResult, onNextBattle }) {
+export function VoteResults({ battleResult, onNextBattle, hasMoreBattles }) {
   const { blog1, blog2, blog1Votes, blog2Votes } = battleResult;
   const totalVotes = blog1Votes + blog2Votes;
   const blog1Percentage =
@@ -35,6 +35,14 @@ export function VoteResults({ battleResult, onNextBattle }) {
     </div>
   );
 
+  const handleNextClick = () => {
+    if (hasMoreBattles) {
+      onNextBattle();
+    } else {
+      alert("Tebrikler! Oylayacak başka savaş kalmadı.");
+    }
+  };
+
   return (
     <div className="container mx-auto py-10 animate-fade-in">
       <h1 className="text-4xl font-bold text-center mb-4">Sonuçlar</h1>
@@ -56,8 +64,8 @@ export function VoteResults({ battleResult, onNextBattle }) {
       </div>
 
       <div className="text-center mt-12">
-        <Button size="lg" onClick={onNextBattle}>
-          Yeni Savaşa Geç
+        <Button size="lg" onClick={handleNextClick} disabled={!hasMoreBattles}>
+          {hasMoreBattles ? "Yeni Savaşa Geç" : "Tüm Savaşları Oyladınız"}
         </Button>
       </div>
     </div>
