@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { WinnerBadge } from "../blog/WinnerBadge";
 
 export function VoteCard({ blog, onVote, disabled }) {
   return (

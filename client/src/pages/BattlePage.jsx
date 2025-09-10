@@ -1,49 +1,79 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import api from "@/utils/api";
 import { BattleArena } from "@/components/battle/BattleArena";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 function BattlePage() {
-  const [battle, setBattle] = useState(null);
+  const [battles, setBattles] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchActiveBattle = useCallback(async () => {
+  const fetchActiveBattles = useCallback(async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      setError(null);
-      const response = await api.get("/battles/active");
-      setBattle(response.data);
-    } catch (err) {
-      if (err.response && err.response.status === 404) {
-        setBattle(null);
+      const { data } = await api.get("/battles");
+      if (data.length === 0) {
         setError("Şu anda oylama için aktif bir savaş bulunmuyor.");
-      } else {
-        setError("Savaş verisi yüklenirken bir hata oluştu.");
       }
-      console.error(err);
+      setBattles(data);
+    } catch (err) {
+      setError("Savaş verileri yüklenirken bir hata oluştu.");
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchActiveBattle();
-  }, [fetchActiveBattle]);
+    fetchActiveBattles();
+  }, [fetchActiveBattles]);
 
-  if (loading) {
-    return <div className="text-center py-20">Aktif Savaş Aranıyor...</div>;
-  }
+  const goToNextBattle = () => {
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % battles.length);
+  };
 
-  if (error || !battle) {
-    return (
-      <div className="text-center py-20 text-yellow-600">
-        {error || "Aktif savaş bulunamadı."}
-      </div>
+  const goToPrevBattle = () => {
+    setCurrentIndex(
+      (prevIndex) => (prevIndex - 1 + battles.length) % battles.length
     );
-  }
+  };
+
+  if (loading)
+    return <div className="text-center py-20">Savaşlar Yükleniyor...</div>;
+  if (error)
+    return <div className="text-center py-20 text-yellow-600">{error}</div>;
+  if (battles.length === 0)
+    return <div className="text-center py-20">Aktif Savaş Bulunamadı.</div>;
+
+  const currentBattle = battles[currentIndex];
 
   return (
-    <BattleArena initialBattle={battle} onNextBattle={fetchActiveBattle} />
+    <div className="relative">
+      <BattleArena
+        key={currentBattle._id}
+        initialBattle={currentBattle}
+        onNextBattle={goToNextBattle}
+      />
+      {battles.length > 1 && (
+        <>
+          <Button
+            onClick={goToPrevBattle}
+            size="icon"
+            className="absolute left-4 top-1/2 -translate-y-1/2"
+          >
+            <ChevronLeft />
+          </Button>
+          <Button
+            onClick={goToNextBattle}
+            size="icon"
+            className="absolute right-4 top-1/2 -translate-y-1/2"
+          >
+            <ChevronRight />
+          </Button>
+        </>
+      )}
+    </div>
   );
 }
 

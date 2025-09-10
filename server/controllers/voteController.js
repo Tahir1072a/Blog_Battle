@@ -57,3 +57,24 @@ export const castVote = async (req, res) => {
       .json({ message: "Oylama sırasında bir hata oluştu: " + error.message });
   }
 };
+
+// @desc    Giriş yapmış kullanıcının oyladığı savaşları getirir
+// @route   GET /api/votes/my-votes
+export const getMyVotedBattles = async (req, res) => {
+  try {
+    const votes = await Vote.find({ user: req.user._id })
+      .sort({ createdAt: -1 })
+      .populate({
+        path: "battle",
+        populate: [
+          { path: "blog1", model: "Blog" },
+          { path: "blog2", model: "Blog" },
+          { path: "winner", model: "Blog" },
+        ],
+      });
+
+    res.status(200).json(votes);
+  } catch (error) {
+    res.status(500).json({ message: "Oylar alınamadı: " + error.message });
+  }
+};

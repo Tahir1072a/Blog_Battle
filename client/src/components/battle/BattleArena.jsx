@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import api from "@/utils/api";
 import { selectIsAuthenticated } from "@/store/slices/authSlice";
 import { VoteCard } from "./VoteCard";
 import { VoteResults } from "./VoteResults";
+import { VoteAnimation } from "./VoteAnimation";
 
-export function BattleArena({ initialBattle }) {
+export function BattleArena({ initialBattle, onNextBattle }) {
   const [battle, setBattle] = useState(initialBattle);
   const [result, setResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -14,6 +15,22 @@ export function BattleArena({ initialBattle }) {
 
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkIfVoted = async () => {
+      if (isAuthenticated && battle) {
+        const { data: userVotes } = await api.get("/votes/my-votes");
+        const hasVoted = userVotes.some(
+          (vote) => vote.battle._id === battle._id
+        );
+
+        if (hasVoted) {
+          setResult(battle);
+        }
+      }
+    };
+    checkIfVoted();
+  }, [battle, isAuthenticated]);
 
   const handleVote = async (votedForBlogId) => {
     if (!isAuthenticated) {
@@ -39,7 +56,11 @@ export function BattleArena({ initialBattle }) {
   };
 
   if (result) {
-    return <VoteResults battleResult={result} onNextBattle={onNextBattle} />;
+    return (
+      <VoteAnimation>
+        <VoteResults battleResult={result} onNextBattle={onNextBattle} />
+      </VoteAnimation>
+    );
   }
 
   return (

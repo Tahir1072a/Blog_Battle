@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
-export function VoteResults({ battleResult }) {
+export function VoteResults({ battleResult, onNextBattle }) {
   const { blog1, blog2, blog1Votes, blog2Votes } = battleResult;
   const totalVotes = blog1Votes + blog2Votes;
   const blog1Percentage =

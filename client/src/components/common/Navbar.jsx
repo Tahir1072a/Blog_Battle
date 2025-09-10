@@ -1,42 +1,15 @@
-import { Link, useNavigate } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
-import { useState, useEffect } from "react";
-import {
-  logOut,
-  selectIsAuthenticated,
-  selectCurrentUser,
-} from "@/store/slices/authSlice";
+import { Link } from "react-router-dom";
+
 import { Button } from "@/components/ui/button";
 import { Bell } from "lucide-react";
-import api from "@/utils/api";
+
+import { useAuth } from "@/hooks/useAuth";
+import { useNotification } from "@/hooks/useNotification";
 
 function Navbar() {
-  const isAuthenticated = useSelector(selectIsAuthenticated);
-  const currentUser = useSelector(selectCurrentUser);
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-
-  const [notifications, setNotifications] = useState([]);
-  const [showNotifications, setShowNotifications] = useState(false);
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      const fetchNotifications = async () => {
-        try {
-          const { data } = await api.get("/notifications");
-          setNotifications(data);
-        } catch (error) {
-          console.error("Bildirimler alınamadı:", error);
-        }
-      };
-      fetchNotifications();
-    }
-  }, [isAuthenticated]);
-
-  const handleLogout = () => {
-    dispatch(logOut());
-    navigate("/login");
-  };
+  const { isAuthenticated, currentUser, logout } = useAuth();
+  const { notifications, showNotifications, toggleNotifications, unreadCount } =
+    useNotification();
 
   return (
     <nav className="bg-white shadow-md">
@@ -44,21 +17,22 @@ function Navbar() {
         <Link to="/" className="text-xl font-bold text-gray-800">
           Blog Battle
         </Link>
-        <Link to="/battle">
-          <Button variant="ghost">Savaş Alanı</Button>
-        </Link>
-        <div>
+
+        <div className="flex items-center space-x-4">
+          <Link to="/battle">
+            <Button variant="ghost">Savaş Alanı</Button>
+          </Link>
+
           {isAuthenticated ? (
             <>
-              {/* --- YENİ BİLDİRİM İKONU VE DROPDOWN --- */}
               <div className="relative">
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => setShowNotifications(!showNotifications)}
+                  onClick={toggleNotifications}
                 >
                   <Bell className="h-5 w-5" />
-                  {notifications.length > 0 && (
+                  {unreadCount > 0 && (
                     <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
                   )}
                 </Button>
@@ -91,7 +65,9 @@ function Navbar() {
               <Link to="/profile">
                 <Button variant="ghost">Profilim</Button>
               </Link>
-              <Button onClick={handleLogout} variant="destructive">
+              <Button onClick={logout} variant="destructive">
+                {" "}
+                {/* handleLogout -> logout */}
                 Çıkış Yap
               </Button>
             </>

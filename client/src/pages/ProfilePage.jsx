@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import api from "@/utils/api";
 import { selectCurrentUser } from "@/store/slices/authSlice";
 import { BlogList } from "@/components/blog/BlogList";
+import { VotedBattleCard } from "@/components/battle/VotedBattleCard";
 
 function ProfilePage() {
   const currentUser = useSelector(selectCurrentUser);
@@ -10,21 +11,23 @@ function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const [votedBattles, setVotedBattles] = useState([]);
+
   useEffect(() => {
-    const fetchMyBlogs = async () => {
+    const fetchMyData = async () => {
       try {
         setLoading(true);
-        const { data } = await api.get("/blogs/myblogs");
-        setMyBlogs(data);
+        const blogsRes = await api.get("/blogs/myblogs");
+        setMyBlogs(blogsRes.data);
+        const votesRes = await api.get("/votes/my-votes");
+        setVotedBattles(votesRes.data);
       } catch (err) {
-        setError("Yazılarınız yüklenirken bir hata oluştu.");
-        console.error(err);
+        setError("Verileriniz yüklenirken bir hata oluştu.");
       } finally {
         setLoading(false);
       }
     };
-
-    fetchMyBlogs();
+    fetchMyData();
   }, []);
 
   return (
@@ -39,15 +42,32 @@ function ProfilePage() {
         <p className="text-gray-500">{currentUser?.email}</p>
       </div>
 
-      <div>
-        <h2 className="text-2xl font-bold mb-6 border-b pb-2">Yazılarım</h2>
-        {loading ? (
-          <p>Yazılarınız yükleniyor...</p>
-        ) : error ? (
-          <p className="text-red-500">{error}</p>
-        ) : (
-          <BlogList blogs={myBlogs} />
-        )}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16">
+        <div>
+          <h2 className="text-2xl font-bold mb-6 border-b pb-2">Yazılarım</h2>
+          {myBlogs.length > 0 ? (
+            <BlogList blogs={myBlogs} />
+          ) : (
+            <p className="text-gray-500 mt-4">Henüz hiç yazı oluşturmadınız.</p>
+          )}
+        </div>
+
+        <div>
+          <h2 className="text-2xl font-bold mb-6 border-b pb-2">
+            Oyladığım Savaşlar
+          </h2>
+          {votedBattles.length > 0 ? (
+            <div className="space-y-4">
+              {votedBattles.map((vote) => (
+                <VotedBattleCard key={vote._id} vote={vote} />
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500 mt-4">
+              Henüz bir savaşa oy vermediniz.
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );
