@@ -27,10 +27,31 @@ export const createBlog = async (req, res) => {
 // @route   GET /api/blogs
 export const getAllBlogs = async (req, res) => {
   try {
-    const blogs = await Blog.find({}).populate("author", "name");
+    const { category, limit, exclude } = req.query;
+
+    const filter = {};
+
+    if (category) {
+      filter.category = category;
+    }
+
+    if (exclude) {
+      filter._id = { $ne: exclude };
+    }
+
+    let query = Blog.find(filter)
+      .populate("author", "name")
+      .sort({ createdAt: -1 });
+
+    if (limit) {
+      query = query.limit(parseInt(limit, 10));
+    }
+
+    const blogs = await query;
+
     res.status(200).json(blogs);
   } catch (err) {
-    console.error(error);
+    console.error(err);
     res.status(500).json({ message: "Sunucu Hatası" });
   }
 };

@@ -25,6 +25,18 @@ export const blogApi = api.injectEndpoints({
       providesTags: (result, error, id) => [{ type: "Blog", id }],
     }),
 
+    getSimilarBlogs: builder.query({
+      query: ({ category, currentBlogId }) =>
+        `/blogs?category=${category}&limit=3&exclude=${currentBlogId}`,
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.map(({ _id }) => ({ type: "Blog", id: _id })),
+              { type: "Blog", id: "LIST" },
+            ]
+          : [{ type: "Blog", id: "LIST" }],
+    }),
+
     createBlog: builder.mutation({
       query: (newBlog) => ({
         url: "/blogs",
@@ -69,6 +81,7 @@ export const {
   useGetBlogsQuery,
   useGetBlogByIdQuery,
   useCreateBlogMutation,
+  useGetSimilarBlogsQuery,
   useUpdateBlogMutation,
   useDeleteBlogMutation,
   useUploadImageMutation,

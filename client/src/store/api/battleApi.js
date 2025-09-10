@@ -83,9 +83,12 @@ export const battleApi = api.injectEndpoints({
         url: `/admin/battles/${battleId}/resolve`,
         method: "POST",
       }),
+
       invalidatesTags: [
         { type: "Battle", id: "ADMIN_LIST" },
         { type: "Battle", id: "ACTIVE_LIST" },
+        { type: "Blog", id: "LIST" },
+        { type: "User" },
       ],
     }),
   }),
