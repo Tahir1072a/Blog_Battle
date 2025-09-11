@@ -123,7 +123,7 @@ export const resolveExpiredBattles = async () => {
 export const checkAndCreateNewBattles = async () => {
   try {
     const activeBattleCount = await Battle.countDocuments({ status: "active" });
-    const MIN_ACTIVE_BATTLES = 2;
+    const MIN_ACTIVE_BATTLES = 3;
 
     if (activeBattleCount < MIN_ACTIVE_BATTLES) {
       const battlesToCreate = MIN_ACTIVE_BATTLES - activeBattleCount;

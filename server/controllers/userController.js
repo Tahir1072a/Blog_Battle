@@ -17,7 +17,9 @@ export const getUserProfile = catchAsync(async (req, res, next) => {
 
   const [levelInfo, myBlogs, votedBattles] = await Promise.all([
     calculateUserLevel(userId),
-    Blog.find({ author: userId }).sort({ createdAt: -1 }),
+    Blog.find({ author: userId })
+      .populate("author", "name")
+      .sort({ createdAt: -1 }),
     Vote.find({ user: userId })
       .sort({ createdAt: -1 })
       .skip(skip)

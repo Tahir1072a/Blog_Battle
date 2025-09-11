@@ -85,7 +85,7 @@ export const getBlogById = async (req, res) => {
 export const updateBlog = async (req, res) => {
   try {
     const { title, content, imageUrl, category } = req.body;
-    const id = req.params.id; // Blog id
+    const id = req.params.id;
 
     const blog = await Blog.findById(id);
 
@@ -99,12 +99,12 @@ export const updateBlog = async (req, res) => {
 
     if (blog.status === "in_match") {
       const activeBattle = await Battle.findOne({
-        $or: [{ blog1: blogId }, { blog2: blogId }],
+        $or: [{ blog1: id }, { blog2: id }],
         status: "active",
       });
 
       if (activeBattle) {
-        const winnerId = activeBattle.blog1.equals(blogId)
+        const winnerId = activeBattle.blog1.equals(id)
           ? activeBattle.blog2
           : activeBattle.blog1;
 
@@ -130,7 +130,6 @@ export const updateBlog = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-
 // @desc    Bir blog yazısını siler
 // @route   DELETE /api/blogs/:id
 export const deleteBlog = async (req, res) => {

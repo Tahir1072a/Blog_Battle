@@ -1,3 +1,5 @@
+import defaultAvatar from "@/assets/images/default-avatar.jpg";
+
 export function UserProfileHeader({ user }) {
   if (!user || !user.levelInfo) {
     return null;
@@ -8,7 +10,7 @@ export function UserProfileHeader({ user }) {
   return (
     <div className="flex flex-col md:flex-row items-center gap-6 mb-12">
       <img
-        src="/assets/images/default-avatar.jpg"
+        src={defaultAvatar}
         alt="Profil"
         className="w-24 h-24 rounded-full border-4 border-gray-200"
       />
