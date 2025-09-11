@@ -86,7 +86,7 @@ Arayüz `http://localhost:5173` adresinde açılacaktır.
 
 ### 4. Örnek Verileri Yükleme (Seed)
 
-Mülakat gereksinimlerini karşılamak üzere, veritabanını test kullanıcıları, 4 blog yazısı ve 2 aktif savaş ile doldurmak için bir script hazırlanmıştır.
+Mülakat gereksinimlerini karşılamak üzere, veritabanını test kullanıcıları (4), (user, admin), 8 blog yazısı ve 2 aktif savaş ile doldurmak için bir script hazırlanmıştır.
 
 Backend sunucusunu çalıştırdıktan sonra, **yeni bir terminal açın** ve aşağıdaki komutu çalıştırın:
 
