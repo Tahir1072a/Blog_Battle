@@ -31,7 +31,7 @@ export const store = configureStore({
       },
     })
       .concat(api.middleware)
-      .concat(authErrorMiddleware), // authErrorMiddleware eklendi
+      .concat(authErrorMiddleware),
   devTools: process.env.NODE_ENV !== "production",
 });
 

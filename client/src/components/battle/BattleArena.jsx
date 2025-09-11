@@ -1,36 +1,34 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import api from "@/utils/api";
 import { selectIsAuthenticated } from "@/store/slices/authSlice";
+import { useGetMyVotesQuery, useCastVoteMutation } from "@/store/api/battleApi";
 import { VoteCard } from "./VoteCard";
 import { VoteResults } from "./VoteResults";
 import { VoteAnimation } from "./VoteAnimation";
+import { ErrorMessage } from "@/components/common/ErrorMessage";
 
 export function BattleArena({ initialBattle, onNextBattle, hasMoreBattles }) {
-  const [battle, setBattle] = useState(initialBattle);
-  const [result, setResult] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const { data: myVotes = [], isLoading: votesLoading } = useGetMyVotesQuery(
+    undefined,
+    {
+      skip: !useSelector(selectIsAuthenticated),
+    }
+  );
 
-  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const [castVote, { isLoading: voteLoading, error: voteError }] =
+    useCastVoteMutation();
+
+  const [voteResult, setVoteResult] = useState(null);
   const navigate = useNavigate();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
 
-  useEffect(() => {
-    const checkIfVoted = async () => {
-      if (isAuthenticated && battle) {
-        const { data: userVotes } = await api.get("/votes/my-votes");
-        const hasVoted = userVotes.some(
-          (vote) => vote.battle._id === battle._id
-        );
+  const hasVotedForBattle = useMemo(() => {
+    if (!initialBattle || !myVotes.length) return false;
+    return myVotes.some((vote) => vote.battle._id === initialBattle._id);
+  }, [myVotes, initialBattle]);
 
-        if (hasVoted) {
-          setResult(battle);
-        }
-      }
-    };
-    checkIfVoted();
-  }, [battle, isAuthenticated]);
+  const isLoading = votesLoading || voteLoading;
 
   const handleVote = async (votedForBlogId) => {
     if (!isAuthenticated) {
@@ -38,28 +36,34 @@ export function BattleArena({ initialBattle, onNextBattle, hasMoreBattles }) {
       return;
     }
 
-    setIsLoading(true);
-    setError(null);
     try {
-      const response = await api.post(`/votes`, {
-        battleId: battle._id,
+      const result = await castVote({
+        battleId: initialBattle._id,
         blogId: votedForBlogId,
-      });
-      setResult(response.data);
+      }).unwrap();
+
+      setVoteResult(result);
     } catch (err) {
-      setError(
-        err.response?.data?.message || "Oylama sırasında bir hata oluştu."
-      );
-    } finally {
-      setIsLoading(false);
+      console.error("Vote error:", err);
     }
   };
 
-  if (result) {
+  if (votesLoading) {
+    return (
+      <div className="flex justify-center items-center py-20">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p>Oy durumunuz kontrol ediliyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (hasVotedForBattle || voteResult) {
     return (
       <VoteAnimation>
         <VoteResults
-          battleResult={result}
+          battleResult={voteResult || initialBattle}
           onNextBattle={onNextBattle}
           hasMoreBattles={hasMoreBattles}
         />
@@ -74,21 +78,37 @@ export function BattleArena({ initialBattle, onNextBattle, hasMoreBattles }) {
         Hangi yazıyı daha çok beğendin? Tıkla ve oy ver!
       </p>
 
-      {error && <p className="text-center text-red-500 mb-4">{error}</p>}
+      {voteError && (
+        <ErrorMessage
+          message={
+            voteError.data?.message || "Oylama sırasında bir hata oluştu."
+          }
+          className="mb-4"
+        />
+      )}
 
       <div className="flex flex-col md:flex-row justify-center items-stretch gap-8">
         <VoteCard
-          blog={battle.blog1}
+          blog={initialBattle.blog1}
           onVote={handleVote}
           disabled={isLoading}
         />
         <div className="flex items-center font-bold text-2xl">VS</div>
         <VoteCard
-          blog={battle.blog2}
+          blog={initialBattle.blog2}
           onVote={handleVote}
           disabled={isLoading}
         />
       </div>
+
+      {voteLoading && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg flex items-center space-x-3">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+            <span>Oyunuz kaydediliyor...</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

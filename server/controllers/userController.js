@@ -6,13 +6,22 @@ import Vote from "../models/Vote.js";
 // @desc    Giriş yapmış kullanıcının profil bilgilerini getirir
 // @route   GET /api/users/profile
 export const getUserProfile = catchAsync(async (req, res, next) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 5;
+  const skip = (page - 1) * limit;
+
   const userId = req.user._id;
+
+  const totalVotedBattles = await Vote.countDocuments({ user: userId });
+  const totalPages = Math.ceil(totalVotedBattles / limit);
 
   const [levelInfo, myBlogs, votedBattles] = await Promise.all([
     calculateUserLevel(userId),
     Blog.find({ author: userId }).sort({ createdAt: -1 }),
     Vote.find({ user: userId })
       .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
       .populate({
         path: "battle",
         populate: [
@@ -29,6 +38,10 @@ export const getUserProfile = catchAsync(async (req, res, next) => {
       levelInfo,
     },
     myBlogs,
-    votedBattles,
+    votedBattles: {
+      votes: votedBattles,
+      page,
+      totalPages,
+    },
   });
 });

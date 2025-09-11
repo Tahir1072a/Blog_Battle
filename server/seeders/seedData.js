@@ -6,6 +6,7 @@ import User from "../models/User.js";
 import Blog from "../models/Blog.js";
 import Battle from "../models/Battle.js";
 import Vote from "../models/Vote.js";
+import Notification from "../models/Notification.js";
 
 import connectDB from "../config/database.js";
 import { createNewBattle } from "../services/matchingService.js";
@@ -21,6 +22,7 @@ const seedDatabase = async () => {
     await Blog.deleteMany();
     await Battle.deleteMany();
     await Vote.deleteMany();
+    await Notification.deleteMany();
     console.log("Veritabanı temizlendi.");
 
     console.log("Örnek kullanıcılar oluşturuluyor...");

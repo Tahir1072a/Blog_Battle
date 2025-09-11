@@ -30,6 +30,7 @@ export const battleApi = api.injectEndpoints({
       invalidatesTags: [
         { type: "Battle", id: "ACTIVE_LIST" },
         { type: "Vote", id: "MY_VOTES" },
+        { type: "User" },
       ],
       async onQueryStarted({ battleId, blogId }, { dispatch, queryFulfilled }) {
         const patchResult = dispatch(

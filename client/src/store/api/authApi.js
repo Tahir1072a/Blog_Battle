@@ -19,7 +19,10 @@ export const authApi = api.injectEndpoints({
     }),
 
     getProfile: builder.query({
-      query: () => "/users/profile",
+      query: (args) => {
+        const page = args?.page || 1;
+        return `/users/profile?page=${page}`;
+      },
       providesTags: ["User"],
     }),
   }),
