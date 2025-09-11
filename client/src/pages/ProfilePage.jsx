@@ -28,7 +28,6 @@ function ProfilePage() {
     if (window.confirm("Bu yazıyı silmek istediğinizden emin misiniz?")) {
       try {
         await deleteBlog(blogId).unwrap();
-        // Başarılı olunca RTK Query otomatik olarak listeyi güncelleyecektir.
       } catch (err) {
         alert(
           "Yazı silinirken bir hata oluştu: " +
