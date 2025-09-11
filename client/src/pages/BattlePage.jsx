@@ -30,7 +30,7 @@ function BattlePage() {
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const navigate = useNavigate();
 
-  const { data: myVotes } = useGetMyVotesQuery(undefined, {
+  const { data: myVotes = [] } = useGetMyVotesQuery(undefined, {
     skip: !isAuthenticated,
   });
 
@@ -39,7 +39,6 @@ function BattlePage() {
 
   const votedBattleIds = new Set(myVotes?.map((vote) => vote.battle._id));
 
-  // Bu fonksiyonun imzası doğru: (battleId, blogId)
   const handleVote = async (battleId, blogId) => {
     if (!isAuthenticated) {
       navigate("/login", { state: { from: { pathname: "/battle" } } });
@@ -70,11 +69,38 @@ function BattlePage() {
 
   const goToNextUnvotedBattle = () => {
     setResultAfterVote(null);
-    if (currentIndex < battles.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-    } else {
-      alert("Tebrikler! Tüm aktif savaşları oyladınız.");
+
+    for (let i = currentIndex + 1; i < battles.length; i++) {
+      if (!votedBattleIds.has(battles[i]._id)) {
+        setCurrentIndex(i);
+        return;
+      }
     }
+
+    for (let i = 0; i < currentIndex; i++) {
+      if (!votedBattleIds.has(battles[i]._id)) {
+        setCurrentIndex(i);
+        return;
+      }
+    }
+
+    alert("Tebrikler! Tüm aktif savaşları oyladınız.");
+  };
+
+  const hasMoreBattles = () => {
+    for (let i = currentIndex + 1; i < battles.length; i++) {
+      if (!votedBattleIds.has(battles[i]._id)) {
+        return true;
+      }
+    }
+
+    for (let i = 0; i < currentIndex; i++) {
+      if (!votedBattleIds.has(battles[i]._id)) {
+        return true;
+      }
+    }
+
+    return false;
   };
 
   if (isLoading) return <PageLoader text="Savaşlar Yükleniyor..." />;
@@ -110,6 +136,7 @@ function BattlePage() {
       />
     );
   }
+
   const hasVotedOrResultShown =
     votedBattleIds.has(currentBattle._id) || resultAfterVote;
 
@@ -145,8 +172,8 @@ function BattlePage() {
       {hasVotedOrResultShown ? (
         <VoteResults
           battleResult={resultAfterVote || currentBattle}
-          onNextBattle={goToNextUnvotedBattle}
-          hasMoreBattles={currentIndex < battles.length - 1}
+          onNextBattle={hasMoreBattles() ? goToNextUnvotedBattle : null}
+          hasMoreBattles={hasMoreBattles()}
         />
       ) : (
         <SwipeableCard

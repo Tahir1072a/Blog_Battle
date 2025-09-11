@@ -25,10 +25,14 @@ export const sendBattleStartNotification = async (blog1, blog2) => {
   );
 };
 
-export const sendBattleResultNotifications = async (winnerBlog, loserBlog) => {
+export const sendBattleResultNotifications = async (
+  winnerBlog,
+  loserBlog,
+  updatedRound
+) => {
   await createNotification(
     winnerBlog.author,
-    `🎉 Tebrikler! "**${winnerBlog.title}**" başlıklı yazınız savaşı kazandı ve ${winnerBlog.round}. seviyeye yükseldi!`
+    `🎉 Tebrikler! "**${winnerBlog.title}**" başlıklı yazınız savaşı kazandı ve ${updatedRound}. seviyeye yükseldi!`
   );
   await createNotification(
     loserBlog.author,

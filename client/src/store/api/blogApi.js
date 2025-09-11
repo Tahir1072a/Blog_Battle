@@ -43,7 +43,7 @@ export const blogApi = api.injectEndpoints({
         method: "POST",
         body: newBlog,
       }),
-      invalidatesTags: [{ type: "Blog", id: "LIST" }],
+      invalidatesTags: [{ type: "Blog", id: "LIST" }, { type: "User" }],
     }),
 
     updateBlog: builder.mutation({
@@ -55,6 +55,7 @@ export const blogApi = api.injectEndpoints({
       invalidatesTags: (result, error, { id }) => [
         { type: "Blog", id },
         { type: "Blog", id: "LIST" },
+        { type: "User" },
       ],
     }),
 
@@ -63,7 +64,11 @@ export const blogApi = api.injectEndpoints({
         url: `/blogs/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: [{ type: "Blog", id: "LIST" }],
+      invalidatesTags: [
+        { type: "Blog", id: "LIST" },
+        { type: "User" },
+        { type: "Battle", id: "ACTIVE_LIST" },
+      ],
     }),
 
     uploadImage: builder.mutation({

@@ -10,6 +10,7 @@ import BattlePage from "./pages/BattlePage";
 import ProfilePage from "./pages/ProfilePage";
 import AdminRoute from "./components/common/AdminRoute";
 import AdminPage from "./pages/AdminPage";
+import EditBlogPage from "./pages/EditBlogPage";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
           <Route element={<PrivateRoute />}>
             <Route path="/create-blog" element={<CreateBlogPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/blog/:id/edit" element={<EditBlogPage />} />
           </Route>
 
           <Route element={<AdminRoute />}>

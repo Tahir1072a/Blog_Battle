@@ -4,7 +4,15 @@ import { VotedBattleCard } from "@/components/battle/VotedBattleCard";
 import { Trophy, FileText, BarChart2 } from "lucide-react";
 import { Pagination } from "@/components/common/Pagination";
 
-export function UserProfile({ stats, myBlogs, votedBattles, onPageChange }) {
+export function UserProfile({
+  stats,
+  myBlogs,
+  votedBattles,
+  onPageChange,
+  onEdit,
+  onDelete,
+  isDeleting,
+}) {
   const { votes, page, totalPages } = votedBattles;
 
   return (
@@ -38,7 +46,12 @@ export function UserProfile({ stats, myBlogs, votedBattles, onPageChange }) {
         <div>
           <h2 className="text-2xl font-bold mb-6 border-b pb-2">Yazılarım</h2>
           {myBlogs.length > 0 ? (
-            <BlogList blogs={myBlogs} />
+            <BlogList
+              blogs={myBlogs}
+              showActions={true}
+              onEdit={onEdit}
+              onDelete={onDelete}
+            />
           ) : (
             <p className="text-gray-500 mt-4">Henüz hiç yazı oluşturmadınız.</p>
           )}

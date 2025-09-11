@@ -88,6 +88,38 @@ const seedDatabase = async () => {
         category: "Gastronomi",
         author: users[1]._id,
       },
+      {
+        title: "Minimalizm: Az Eşya ile Daha Anlamlı Bir Hayat",
+        content:
+          "Son yılların popüler akımı minimalizm, sadece eşyalardan kurtulmak değil, aynı zamanda zihinsel bir arınma süreci. Bu felsefenin hayatınıza nasıl pozitif etkiler yapabileceğini keşfedin...",
+        imageUrl: "http://localhost:5000/api/uploads/sample-ai-art.jpg",
+        category: "Kişisel Gelişim",
+        author: users[2]._id,
+      },
+      {
+        title: "Finansal Özgürlüğe Giden Yol: Bütçe Yönetimi Sırları",
+        content:
+          "Geliriniz ne olursa olsun, doğru bütçe yönetimi ile finansal hedeflerinize ulaşabilirsiniz. Aylık harcamalarınızı kontrol altına almanın ve birikim yapmanın pratik yolları...",
+        imageUrl: "http://localhost:5000/api/uploads/sample-space.jpg",
+        category: "Finans",
+        author: users[2]._id,
+      },
+      {
+        title: "Ege'nin Saklı Kumsalları: Kalabalıktan Uzak Tatil Rotaları",
+        content:
+          "Bodrum ve Çeşme'nin kalabalığından sıkılanlar için Ege'nin bakir kalmış koylarını ve sakin kasabalarını listeledik. Huzurlu bir tatil için en iyi adresler burada.",
+        imageUrl: "http://localhost:5000/api/uploads/sample-egypt.jpg",
+        category: "Gezi",
+        author: users[3]._id,
+      },
+      {
+        title: "Sağlıklı Yaşam İçin 5 Altın Kural",
+        content:
+          "Dengeli beslenme, düzenli egzersiz ve kaliteli uyku... Sağlıklı bir yaşam sürmek için bilmeniz gereken temel prensipleri ve hayatınıza kolayca entegre edebileceğiniz alışkanlıkları derledik.",
+        imageUrl: "http://localhost:5000/api/uploads/sample-sushi.jpg",
+        category: "Sağlık",
+        author: users[3]._id,
+      },
     ]);
     console.log(`${blogs.length} blog yazısı oluşturuldu.`);
 

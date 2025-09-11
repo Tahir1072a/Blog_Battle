@@ -1,5 +1,9 @@
 import Blog from "../models/Blog.js";
 import mongoose from "mongoose";
+import Battle from "../models/Battle.js";
+import Notification from "../models/Notification.js";
+
+import { resolveBattle } from "../services/bracketService.js";
 
 // @desc    Yeni bir blog yazısı oluşturur
 // @route   POST /api/blogs
@@ -93,6 +97,28 @@ export const updateBlog = async (req, res) => {
       return res.status(401).json({ message: "Bu işlem için yetkiniz yok" });
     }
 
+    if (blog.status === "in_match") {
+      const activeBattle = await Battle.findOne({
+        $or: [{ blog1: blogId }, { blog2: blogId }],
+        status: "active",
+      });
+
+      if (activeBattle) {
+        const winnerId = activeBattle.blog1.equals(blogId)
+          ? activeBattle.blog2
+          : activeBattle.blog1;
+
+        activeBattle.blog1Votes = activeBattle.blog1.equals(winnerId) ? 1 : 0;
+        activeBattle.blog2Votes = activeBattle.blog2.equals(winnerId) ? 1 : 0;
+        await activeBattle.save();
+
+        await resolveBattle(activeBattle._id);
+        console.log(
+          `Blog güncellendiği için Savaş #${activeBattle._id} sonlandırıldı.`
+        );
+      }
+    }
+
     blog.title = title || blog.title;
     blog.content = content || blog.content;
     blog.imageUrl = imageUrl || blog.imageUrl;
@@ -111,7 +137,7 @@ export const deleteBlog = async (req, res) => {
   try {
     const blogId = req.params.id;
 
-    const blog = await Blog.findById(blogId).lean();
+    const blog = await Blog.findById(blogId);
 
     if (!blog) {
       return res.status(404).json({ message: "Blog Bulunamadı" });
@@ -121,10 +147,46 @@ export const deleteBlog = async (req, res) => {
       return res.status(401).json({ message: "Bu işlem için yetkiniz yoktur" });
     }
 
+    if (blog.status === "in_match") {
+      const activeBattle = await Battle.findOne({
+        $or: [{ blog1: blogId }, { blog2: blogId }],
+        status: "active",
+      });
+
+      if (activeBattle) {
+        const winnerBlogId = activeBattle.blog1.equals(blogId)
+          ? activeBattle.blog2
+          : activeBattle.blog1;
+
+        await Blog.findByIdAndUpdate(winnerBlogId, {
+          $inc: { round: 1 },
+          $set: { status: "in_pool" },
+        });
+
+        activeBattle.status = "finished";
+        activeBattle.winner = winnerBlogId;
+        await activeBattle.save();
+
+        const winnerBlog = await Blog.findById(winnerBlogId);
+
+        if (winnerBlog && winnerBlog.author) {
+          await Notification.create({
+            user: winnerBlog.author,
+            message: `🎉 Rakibiniz yazısını sildiği için "**${winnerBlog.title}**" başlıklı yazınız savaşı otomatik olarak kazandı!`,
+          });
+        }
+      }
+    }
+
     await Blog.findByIdAndDelete(blogId);
 
-    res.status(200).json({ message: "Blog bşarıyla silindi" });
+    res.status(200).json({
+      message: "Blog başarıyla silindi ve ilgili savaş sonlandırıldı.",
+    });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("Blog silme hatası:", err);
+    res
+      .status(500)
+      .json({ message: "Blog silinirken bir hata oluştu: " + err.message });
   }
 };

@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-export function VoteResults({ battleResult, onNextBattle }) {
+export function VoteResults({ battleResult, onNextBattle, hasMoreBattles }) {
   const { blog1, blog2, blog1Votes, blog2Votes } = battleResult;
   const totalVotes = blog1Votes + blog2Votes;
   const blog1Percentage =
@@ -35,14 +35,6 @@ export function VoteResults({ battleResult, onNextBattle }) {
     </div>
   );
 
-  const handleNextClick = () => {
-    if (hasMoreBattles) {
-      onNextBattle();
-    } else {
-      alert("Tebrikler! Oylayacak başka savaş kalmadı.");
-    }
-  };
-
   return (
     <div className="container mx-auto py-10 animate-fade-in">
       <h1 className="text-4xl font-bold text-center mb-4">Sonuçlar</h1>
@@ -63,13 +55,25 @@ export function VoteResults({ battleResult, onNextBattle }) {
         />
       </div>
 
-      {onNextBattle && (
-        <div className="text-center mt-12">
+      <div className="text-center mt-12">
+        {hasMoreBattles && onNextBattle ? (
           <Button size="lg" onClick={onNextBattle}>
-            Kalan Savaşları Gör
+            Sonraki Savaşa Geç
           </Button>
-        </div>
-      )}
+        ) : (
+          <div className="space-y-4">
+            <p className="text-lg font-semibold text-green-600">
+              🎉 Tebrikler! Tüm aktif savaşları oyladınız.
+            </p>
+            <p className="text-sm text-gray-500">
+              Yeni savaşlar eklendiğinde bildirim alacaksınız.
+            </p>
+            <Button variant="outline" onClick={() => window.location.reload()}>
+              Yenile ve Kontrol Et
+            </Button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
